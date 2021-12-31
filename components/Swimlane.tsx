@@ -15,7 +15,6 @@ export type SwimlaneDataProps = {
 
 type SwimlaneProps = {
 	swimlane: SwimlaneDataProps
-	handleDragEnd: Function
 	kanban: Array<SwimlaneDataProps>
 	setKanban: React.Dispatch<React.SetStateAction<string>>
 }
