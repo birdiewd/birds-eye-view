@@ -269,15 +269,26 @@ function MyApp({ Component, pageProps }: AppProps) {
 		if (error) {
 			console.error(error)
 		} else {
-			const swimlaneIndex = swimlanes.findIndex(
-				({ id }) => id === swimlaneId
-			)
-			const swimlane = swimlanes[swimlaneIndex]
+			console.log(data)
 
-			swimlane = {
-				...swimlane,
-				...newProps,
-			}
+			setSwimlanes(
+				swimlanes.map((swimlane) =>
+					swimlane.id === data[0].id ? data[0] : swimlane
+				)
+			)
+		}
+	}
+
+	const handleAddSwimlane = async (swimlane) => {
+		const { data, error } = await supabaseClient.from('swimlanes').insert({
+			name: `New Swimlane - ${Date()}`,
+		})
+
+		if (error) {
+			console.error(error)
+		} else {
+			console.log(data)
+			setSwimlanes([...swimlanes, ...data])
 		}
 	}
 
@@ -379,32 +390,37 @@ function MyApp({ Component, pageProps }: AppProps) {
 	*/
 	useEffect(() => {
 		if (swimlanes.length && columns.length) {
-			const newKanban = swimlanes.map((swimlane) => ({
-				...swimlane,
-				columns: columns.map((column) => {
-					const filteredItems = items.filter(
-						(item) =>
-							item.name
-								.toLowerCase()
-								.match(filterString.toLowerCase()) ||
-							(item?.description || '')
-								.toLowerCase()
-								.match(filterString.toLowerCase())
-					)
-					return {
-						...column,
-						items: filteredItems
-							.filter(
-								(item) =>
-									item.swimlane_id === swimlane.id &&
-									item.column_id === column.id &&
-									item.is_active &&
-									!item.is_archived
-							)
-							.sort((a, b) => a.sort_order - b.sort_order),
-					}
-				}),
-			}))
+			const newKanban = swimlanes
+				.sort((a, b) =>
+					a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+				)
+				.filter(({ is_active }) => is_active)
+				.map((swimlane) => ({
+					...swimlane,
+					columns: columns.map((column) => {
+						const filteredItems = items.filter(
+							(item) =>
+								item.name
+									.toLowerCase()
+									.match(filterString.toLowerCase()) ||
+								(item?.description || '')
+									.toLowerCase()
+									.match(filterString.toLowerCase())
+						)
+						return {
+							...column,
+							items: filteredItems
+								.filter(
+									(item) =>
+										item.swimlane_id === swimlane.id &&
+										item.column_id === column.id &&
+										item.is_active &&
+										!item.is_archived
+								)
+								.sort((a, b) => a.sort_order - b.sort_order),
+						}
+					}),
+				}))
 
 			setKanban(newKanban)
 		}
@@ -430,6 +446,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 				handleUpdateCard,
 				handleDeleteCard,
 				handleArchiveCompleted,
+
+				handleAddSwimlane,
 				handleUpdateSwimlane,
 
 				fetchSwimlanes,

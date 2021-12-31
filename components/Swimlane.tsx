@@ -65,7 +65,25 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 				onClick={toggleIsOpen}
 			>
 				<Flex gap={'.5rem'}>
-					<Heading as="h2" size={'sm'}>
+					<Heading
+						as="h2"
+						size={'sm'}
+						contentEditable={true}
+						onClick={(event) => {
+							event.stopPropagation()
+						}}
+						onKeyPress={(event) => {
+							if (event.code === 'Enter') {
+								event.target.blur()
+							}
+						}}
+						onBlur={(event) =>
+							handleUpdateSwimlane(swimlane.id, {
+								name: event.target.innerText,
+							})
+						}
+						padding={'0 .25rem'}
+					>
 						{swimlane.name}
 					</Heading>
 					{swimlane.columns.map(({ items }, index) => (
@@ -124,7 +142,7 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 						: 0,
 					opacity: isOpen ? 1 : 0,
 					overflow: 'hidden',
-					transition: 'all 250ms ease-in-out',
+					transition: 'all 350ms',
 				}}
 			>
 				<DragDropContext

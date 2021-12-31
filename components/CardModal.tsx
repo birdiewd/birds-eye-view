@@ -59,7 +59,7 @@ const CardModal: NextPage = () => {
 	}
 
 	const handleControlEnter = (event) => {
-		if (event.code && event.ctrlKey) {
+		if (event.code === 'Enter' && event.ctrlKey) {
 			handleCardSave()
 		}
 	}

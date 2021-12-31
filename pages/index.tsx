@@ -25,6 +25,7 @@ const Home: NextPage = () => {
 	const {
 		handleLogout,
 		handleArchiveCompleted,
+		handleAddSwimlane,
 		handleDragEnd,
 		setKanban,
 		setFilterString,
@@ -64,8 +65,11 @@ const Home: NextPage = () => {
 					maxWidth={'15rem'}
 					onChange={handleFilterChange}
 				/>
-				<Button colorScheme={'green'} onClick={handleArchiveCompleted}>
+				<Button colorScheme={'gray'} onClick={handleArchiveCompleted}>
 					Archive Completed
+				</Button>
+				<Button colorScheme={'green'} onClick={handleAddSwimlane}>
+					Add Swimlane
 				</Button>
 				<Button colorScheme={'orange'} onClick={handleLogout}>
 					Logout
@@ -75,6 +79,7 @@ const Home: NextPage = () => {
 			<SimpleGrid gap={'1rem'} columns={columns.length} mt={'1rem'}>
 				{columns.map((column) => (
 					<Flex
+						key={`heading-${column.id}`}
 						gap={'.5rem'}
 						justifyContent={'center'}
 						padding={'.5rem 0'}
@@ -83,11 +88,7 @@ const Home: NextPage = () => {
 						bgColor={'#000000aa'}
 						borderRadius={'.25rem'}
 					>
-						<Heading
-							key={`heading-${column.id}`}
-							as="h2"
-							size={'sm'}
-						>
+						<Heading as="h2" size={'sm'}>
 							{column.name}
 						</Heading>
 						<Badge>
