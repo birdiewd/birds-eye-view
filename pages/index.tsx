@@ -94,7 +94,10 @@ const Home: NextPage = () => {
 						<Badge>
 							{
 								items.filter(
-									({ column_id }) => column_id === column.id
+									({ is_active, is_archived, column_id }) =>
+										is_active &&
+										!is_archived &&
+										column_id === column.id
 								).length
 							}
 						</Badge>

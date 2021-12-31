@@ -68,9 +68,15 @@ const CardModal: NextPage = () => {
 		<Modal
 			isOpen={Boolean(cardData)}
 			onClose={() => setCardIds({ ...cardIds, swimlane: 0 })}
+			// isCentered={true}
 		>
 			<ModalOverlay />
-			<ModalContent>
+			<ModalContent
+				// height={'70vh'}
+				width={'70vw'}
+				maxWidth={'1000'}
+				overflow={'auto'}
+			>
 				<form onSubmit={handleCardSave}>
 					<ModalHeader>Modal Title</ModalHeader>
 					<ModalBody>
