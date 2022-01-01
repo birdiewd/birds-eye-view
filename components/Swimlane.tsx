@@ -2,7 +2,7 @@ import { NextPage } from 'next/types'
 import { SimpleGrid, Heading, Button, Flex, Box, Badge } from '@chakra-ui/react'
 import { DragDropContext } from 'react-beautiful-dnd'
 
-import { useContext, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import AppContext from '../AppContext'
 
 import Column, { ColumnDataProps } from './Column'
@@ -35,6 +35,7 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 	const columnColors = ['#afafaf', '#2cad44', '#ffa844', '#5181c9']
 
 	const [isOpen, setIsOpen] = useState(swimlane.is_open)
+	const [isNameEditable, setIsNameEditable] = useState(false)
 
 	const toggleIsOpen = () => {
 		setIsOpen(!isOpen)
@@ -44,6 +45,8 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 	const deleteSwimlane = () => {
 		handleUpdateSwimlane(swimlane.id, { is_active: false })
 	}
+
+	const editableRef = useRef()
 
 	return (
 		<Box
@@ -67,20 +70,43 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 					<Heading
 						as="h2"
 						size={'sm'}
+						ref={editableRef}
+						suppressContentEditableWarning={true}
 						contentEditable={true}
 						onClick={(event) => {
 							event.stopPropagation()
+							setIsNameEditable(true)
 						}}
-						onKeyPress={(event) => {
-							if (event.code === 'Enter') {
-								event.target.blur()
+						position={'relative'}
+						transition={'all 80ms'}
+						mr={isNameEditable ? '5rem' : 0}
+						onKeyDown={(event) => {
+							switch (event.code) {
+								case 'Enter': {
+									handleUpdateSwimlane(swimlane.id, {
+										name: event.target.innerText,
+									})
+									editableRef?.current?.blur()
+									break
+								}
+
+								case 'Escape': {
+									if (editableRef?.current) {
+										editableRef.current.innerText =
+											swimlane.name
+										editableRef?.current?.blur()
+									}
+									break
+								}
+
+								default:
+									break
 							}
 						}}
-						onBlur={(event) =>
-							handleUpdateSwimlane(swimlane.id, {
-								name: event.target.innerText,
-							})
-						}
+						onFocus={(event) => event.target.sele}
+						onBlur={() => {
+							setIsNameEditable(false)
+						}}
 						padding={'0 .25rem'}
 					>
 						{swimlane.name}
