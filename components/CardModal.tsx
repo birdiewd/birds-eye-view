@@ -16,6 +16,8 @@ import {
 import { useContext, useEffect, useMemo, useState } from 'react'
 import AppContext from '../AppContext'
 
+import Editor from './Editor'
+
 const CardModal: NextPage = () => {
 	const {
 		setCardIds,
@@ -92,7 +94,7 @@ const CardModal: NextPage = () => {
 						</FormControl>
 						<FormControl mt={4}>
 							<FormLabel>Description</FormLabel>
-							<Textarea
+							{/* <Textarea
 								placeholder="Add your description here"
 								onChange={(event) =>
 									setDescription(event.target.value)
@@ -103,7 +105,8 @@ const CardModal: NextPage = () => {
 										? description
 										: undefined
 								}
-							/>
+							/> */}
+							<Editor />
 						</FormControl>
 					</ModalBody>
 
