@@ -11,12 +11,21 @@ import {
 	FormControl,
 	FormLabel,
 	Textarea,
+	Flex,
 } from '@chakra-ui/react'
 
-import { useContext, useEffect, useMemo, useState } from 'react'
+import {
+	FormEvent,
+	ReactEventHandler,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react'
 import AppContext from '../AppContext'
 
 import Editor from './Editor'
+import { KeyboardEventHandler } from 'remirror/extensions'
 
 const CardModal: NextPage = () => {
 	const {
@@ -29,6 +38,7 @@ const CardModal: NextPage = () => {
 
 	const [name, setName] = useState('')
 	const [description, setDescription] = useState('')
+	const [tempDescription, setTempDescription] = useState('')
 
 	const cardData = useMemo(() => {
 		if (cardIds.swimlane) {
@@ -46,7 +56,7 @@ const CardModal: NextPage = () => {
 		setDescription(cardData?.description)
 	}, [cardData])
 
-	const handleCardSave = (event) => {
+	const handleCardSave = (event?: FormEvent) => {
 		if (event) {
 			event.preventDefault()
 		}
@@ -60,8 +70,8 @@ const CardModal: NextPage = () => {
 		}
 	}
 
-	const handleControlEnter = (event) => {
-		if (event.code === 'Enter' && event.ctrlKey) {
+	const handleControlEnter = (event: KeyboardEvent) => {
+		if (event.code === 'Enter' && (event.ctrlKey || event.metaKey)) {
 			handleCardSave()
 		}
 	}
@@ -70,15 +80,9 @@ const CardModal: NextPage = () => {
 		<Modal
 			isOpen={Boolean(cardData)}
 			onClose={() => setCardIds({ ...cardIds, swimlane: 0 })}
-			// isCentered={true}
 		>
 			<ModalOverlay />
-			<ModalContent
-				// height={'70vh'}
-				width={'70vw'}
-				maxWidth={'1000'}
-				overflow={'auto'}
-			>
+			<ModalContent width={'70vw'} maxWidth={'1000'} overflow={'auto'}>
 				<form onSubmit={handleCardSave}>
 					<ModalHeader>Modal Title</ModalHeader>
 					<ModalBody>
@@ -94,40 +98,36 @@ const CardModal: NextPage = () => {
 						</FormControl>
 						<FormControl mt={4}>
 							<FormLabel>Description</FormLabel>
-							{/* <Textarea
-								placeholder="Add your description here"
-								onChange={(event) =>
-									setDescription(event.target.value)
-								}
-								onKeyPress={handleControlEnter}
-								value={
-									description?.length
-										? description
-										: undefined
-								}
-							/> */}
-							<Editor />
+
+							<Editor
+								content={description}
+								setContent={setDescription}
+								handleControlEnter={handleControlEnter}
+								isEditable={true}
+							/>
 						</FormControl>
 					</ModalBody>
 
 					<ModalFooter>
-						<Button colorScheme="blue" mr={3} type="submit">
-							Save
-						</Button>
-						<Button
-							colorScheme="red"
-							onClick={() => handleDeleteCard()}
-						>
-							Delete
-						</Button>
-						<Button
-							variant="ghost"
-							onClick={() =>
-								setCardIds({ ...cardIds, swimlane: 0 })
-							}
-						>
-							Cancel
-						</Button>
+						<Flex gap={'.5rem'} justifyContent={'flex-end'}>
+							<Button colorScheme="blue" type="submit">
+								Save
+							</Button>
+							<Button
+								colorScheme="red"
+								onClick={() => handleDeleteCard()}
+							>
+								Delete
+							</Button>
+							<Button
+								variant="ghost"
+								onClick={() =>
+									setCardIds({ ...cardIds, swimlane: 0 })
+								}
+							>
+								Cancel
+							</Button>
+						</Flex>
 					</ModalFooter>
 				</form>
 			</ModalContent>

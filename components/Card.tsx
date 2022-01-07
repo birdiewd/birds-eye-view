@@ -5,6 +5,8 @@ import { useContext } from 'react'
 import AppContext from '../AppContext'
 import { Box, Flex, Tooltip } from '@chakra-ui/react'
 
+import RteEditor from './Editor'
+
 export type CardDataProps = {
 	id: string
 	name: string
@@ -28,7 +30,6 @@ const Card: NextPage<CardProps> = ({ card, provided, snapshot }) => {
 			{...provided.dragHandleProps}
 			style={{
 				margin: '.25rem',
-				// maxHeight: '5rem',
 				overflow: 'hidden',
 				border: 'solid 1px transparent',
 				borderWidth: '1px 1px 1px 5px',
@@ -66,9 +67,10 @@ const Card: NextPage<CardProps> = ({ card, provided, snapshot }) => {
 				}}
 				background={'#ccccdd55'}
 				borderTop={'solid #00000033 2px'}
-			>
-				{card.description}
-			</Box>
+				maxHeight={'4.75rem'}
+				as={RteEditor}
+				content={card.description}
+			/>
 		</Flex>
 	)
 }

@@ -158,10 +158,11 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 				columns={swimlane.columns.length}
 				style={{
 					maxHeight: isOpen
-						? (swimlane.columns
-								.map((column) => column.items.length)
-								.sort()
-								.reverse()[0] +
+						? (Math.max(
+								...swimlane.columns.map(
+									({ items }) => items.length
+								)
+						  ) +
 								1) *
 						  100
 						: 0,
