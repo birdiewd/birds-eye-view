@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { supabaseClient } from '../../../../lib/client'
+import { supabaseClient } from '../../../lib/client'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 	const { id } = req.query
