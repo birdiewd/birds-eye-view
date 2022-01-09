@@ -10,22 +10,11 @@ import {
 	Input,
 	FormControl,
 	FormLabel,
-	Textarea,
 	Flex,
 } from '@chakra-ui/react'
 
-import {
-	FormEvent,
-	ReactEventHandler,
-	useContext,
-	useEffect,
-	useMemo,
-	useState,
-} from 'react'
+import { FormEvent, useContext, useEffect, useMemo, useState } from 'react'
 import AppContext from '../AppContext'
-
-import Editor from './Editor'
-import { KeyboardEventHandler } from 'remirror/extensions'
 
 const CardModal: NextPage = () => {
 	const {
@@ -37,8 +26,6 @@ const CardModal: NextPage = () => {
 	} = useContext(AppContext)
 
 	const [name, setName] = useState('')
-	const [description, setDescription] = useState('')
-	const [tempDescription, setTempDescription] = useState('')
 
 	const cardData = useMemo(() => {
 		if (cardModalData.swimlane) {
@@ -53,7 +40,6 @@ const CardModal: NextPage = () => {
 
 	useEffect(() => {
 		setName(cardData?.name)
-		setDescription(cardData?.description)
 	}, [cardData])
 
 	const handleCardSave = (event?: FormEvent) => {
@@ -63,16 +49,10 @@ const CardModal: NextPage = () => {
 
 		if (cardData?.id) {
 			// upsert
-			handleUpdateCard(cardData.id, name, description)
+			handleUpdateSwimlane(swimlaneData.id, name)
 		} else {
 			// insert
-			handleAddCard(cardData.swimlaneId, name, description)
-		}
-	}
-
-	const handleControlEnter = (event: KeyboardEvent) => {
-		if (event.code === 'Enter' && (event.ctrlKey || event.metaKey)) {
-			handleCardSave()
+			handleAddSwimlane(name)
 		}
 	}
 
@@ -94,16 +74,6 @@ const CardModal: NextPage = () => {
 									setName(event.target.value)
 								}
 								value={name}
-							/>
-						</FormControl>
-						<FormControl mt={4}>
-							<FormLabel>Description</FormLabel>
-
-							<Editor
-								content={description}
-								setContent={setDescription}
-								handleControlEnter={handleControlEnter}
-								isEditable={true}
 							/>
 						</FormControl>
 					</ModalBody>

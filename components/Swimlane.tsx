@@ -17,6 +17,7 @@ type SwimlaneProps = {
 	swimlane: SwimlaneDataProps
 	kanban: Array<SwimlaneDataProps>
 	setKanban: React.Dispatch<React.SetStateAction<string>>
+	handleDragEnd: CallableFunction
 }
 
 const Swimlane: NextPage<SwimlaneProps> = ({
@@ -26,7 +27,7 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 	setKanban,
 }) => {
 	const {
-		setCardIds,
+		setCardModalData,
 		handleUpdateSwimlane,
 
 		state: { items },
@@ -145,7 +146,7 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 						size={'xs'}
 						onClick={(event) => {
 							event.stopPropagation()
-							setCardIds({ item: 0, swimlane: swimlane.id })
+							setCardModalData({ item: 0, swimlane: swimlane.id })
 						}}
 					>
 						Add Card
@@ -164,7 +165,7 @@ const Swimlane: NextPage<SwimlaneProps> = ({
 								)
 						  ) +
 								1) *
-						  100
+						  120
 						: 0,
 					opacity: isOpen ? 1 : 0,
 					overflow: 'hidden',

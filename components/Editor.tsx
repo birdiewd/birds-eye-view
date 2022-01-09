@@ -67,8 +67,6 @@ import {
 } from 'react'
 
 import 'remirror/styles/all.css'
-import { Schema } from '@remirror/pm/model'
-import { EditorState } from '@remirror/pm/state'
 
 type RteEditorProps = {
 	content: string

@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app'
-import { ChakraProvider, filter } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
@@ -8,8 +8,19 @@ import { supabaseClient } from '../lib/client'
 import Head from 'next/head'
 
 import '../styles/globals.css'
+import { DropResult } from 'react-beautiful-dnd'
+import { SwimlaneDataProps } from '../components/Swimlane'
+import { ColumnDataProps } from '../components/Column'
 
 const unAuthedPathes = ['/signin', '/recover', '/reset', '/signup']
+
+type ItemDbProps = {
+	id: string
+	swimlane_id: string
+	column_id: string
+	name: string
+	description: string
+}
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const router = useRouter()
@@ -20,9 +31,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 	const [kanban, setKanban] = useState([])
 	const [filterString, setFilterString] = useState('')
 
-	const [cardIds, setCardIds] = useState({
+	const [cardModalData, setCardModalData] = useState({
 		swimlane: 0,
 		item: 0,
+	})
+
+	const [swimlaneModalData, setSwimlaneModalData] = useState({
+		swimlane: 0,
 	})
 
 	/*
@@ -95,10 +110,20 @@ function MyApp({ Component, pageProps }: AppProps) {
 	 ######  ##     ##  #######  ########
 	*/
 
-	const handleDeleteCard = async (itemId) => {
-		const deleteId = itemId || cardIds.item
+	/*
+	        ######     ###    ########  ########
+	       ##    ##   ## ##   ##     ## ##     ##
+	       ##        ##   ##  ##     ## ##     ##
+	       ##       ##     ## ########  ##     ##
+	       ##       ######### ##   ##   ##     ##
+	###    ##    ## ##     ## ##    ##  ##     ##
+	###     ######  ##     ## ##     ## ########
+	*/
 
-		console.log(itemId, cardIds.item, deleteId)
+	const handleDeleteCard = async (itemId: string) => {
+		const deleteId = itemId || cardModalData.item
+
+		console.log(itemId, cardModalData.item, deleteId)
 		const { data, error } = await supabaseClient.from('items').upsert({
 			...items.filter(({ id }) => id === deleteId)[0],
 			is_active: false,
@@ -107,9 +132,9 @@ function MyApp({ Component, pageProps }: AppProps) {
 		if (error) {
 			console.error(error)
 		} else {
-			handleUpsertItemData(data)
+			handleUpsertItemData(data as [ItemDbProps])
 
-			setCardIds({
+			setCardModalData({
 				item: 0,
 				swimlane: 0,
 			})
@@ -134,7 +159,11 @@ function MyApp({ Component, pageProps }: AppProps) {
 		}
 	}
 
-	const handleAddCard = async (swimlaneId, name, description) => {
+	const handleAddCard = async (
+		swimlaneId: string,
+		name: string,
+		description: string
+	) => {
 		const { data, error } = await supabaseClient.from('items').insert({
 			swimlane_id: swimlaneId,
 			column_id: columns[0].id,
@@ -148,14 +177,18 @@ function MyApp({ Component, pageProps }: AppProps) {
 		} else {
 			handleUpsertItemData(data)
 
-			setCardIds({
+			setCardModalData({
 				item: 0,
 				swimlane: 0,
 			})
 		}
 	}
 
-	const handleUpdateCard = async (itemId, name, description) => {
+	const handleUpdateCard = async (
+		itemId: string,
+		name: string,
+		description: string
+	) => {
 		const { data, error } = await supabaseClient.from('items').upsert({
 			...items.filter(({ id }) => id === itemId)[0],
 			name: name?.trim(),
@@ -167,14 +200,14 @@ function MyApp({ Component, pageProps }: AppProps) {
 		} else {
 			handleUpsertItemData(data)
 
-			setCardIds({
+			setCardModalData({
 				item: 0,
 				swimlane: 0,
 			})
 		}
 	}
 
-	const handleMoveCards = async (destinationColumn) => {
+	const handleMoveCards = async (destinationColumn: ColumnDataProps) => {
 		const cards = destinationColumn.items.map((item, index) => ({
 			...item,
 			sort_order: index,
@@ -189,7 +222,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 		}
 	}
 
-	const handleDragEnd = (result, swimlane, kanban, setKanban) => {
+	const handleDragEnd = (
+		result: DropResult,
+		swimlane: SwimlaneDataProps,
+		kanban: [SwimlaneDataProps],
+		setKanban: CallableFunction
+	) => {
 		if (!result.destination) return
 
 		const swimlaneIndex = kanban.map(({ id }) => id).indexOf(swimlane.id)
@@ -238,7 +276,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 		setKanban(newKanban)
 	}
 
-	const handleUpsertItemData = (data) => {
+	const handleUpsertItemData = (data: [ItemDbProps]) => {
 		const updatedItems = items.map((item) => {
 			const datumIndex = data.findIndex((datum) => datum.id === item.id)
 
@@ -259,6 +297,16 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 		setItems([...updatedItems, ...newItems])
 	}
+
+	/*
+	        ######  ##      ## #### ##     ## ##          ###    ##    ## ########
+	       ##    ## ##  ##  ##  ##  ###   ### ##         ## ##   ###   ## ##
+	       ##       ##  ##  ##  ##  #### #### ##        ##   ##  ####  ## ##
+	        ######  ##  ##  ##  ##  ## ### ## ##       ##     ## ## ## ## ######
+	             ## ##  ##  ##  ##  ##     ## ##       ######### ##  #### ##
+	###    ##    ## ##  ##  ##  ##  ##     ## ##       ##     ## ##   ### ##
+	###     ######   ###  ###  #### ##     ## ######## ##     ## ##    ## ########
+	*/
 
 	const handleUpdateSwimlane = async (swimlaneId, newProps) => {
 		const { data, error } = await supabaseClient.from('swimlanes').upsert({
@@ -291,6 +339,16 @@ function MyApp({ Component, pageProps }: AppProps) {
 			setSwimlanes([...swimlanes, ...data])
 		}
 	}
+
+	/*
+	        ######   #######  ##       ##     ## ##     ## ##    ##
+	       ##    ## ##     ## ##       ##     ## ###   ### ###   ##
+	       ##       ##     ## ##       ##     ## #### #### ####  ##
+	       ##       ##     ## ##       ##     ## ## ### ## ## ## ##
+	       ##       ##     ## ##       ##     ## ##     ## ##  ####
+	###    ##    ## ##     ## ##       ##     ## ##     ## ##   ###
+	###     ######   #######  ########  #######  ##     ## ##    ##
+	*/
 
 	/*
 	   ###    ##     ## ######## ##     ##
@@ -435,7 +493,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 					columns,
 					items,
 					kanban,
-					cardIds,
+					cardModalData,
 				},
 
 				handleLogout,
@@ -454,7 +512,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 				fetchColumns,
 				fetchItems,
 
-				setCardIds,
+				setCardModalData,
 				setKanban,
 				setFilterString,
 			}}

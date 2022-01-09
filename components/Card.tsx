@@ -20,7 +20,7 @@ type CardProps = {
 }
 
 const Card: NextPage<CardProps> = ({ card, provided, snapshot }) => {
-	const { setCardIds } = useContext(AppContext)
+	const { setCardModalData } = useContext(AppContext)
 
 	return (
 		<Flex
@@ -40,7 +40,7 @@ const Card: NextPage<CardProps> = ({ card, provided, snapshot }) => {
 				...provided.draggableProps.style,
 			}}
 			onClick={() => {
-				setCardIds({
+				setCardModalData({
 					item: card.id,
 					swimlane: card.swimlane_id,
 				})
